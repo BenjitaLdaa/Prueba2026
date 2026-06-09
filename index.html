@@ -611,7 +611,7 @@ async function syncDatabase(){
     if(r.ok){const data=await r.json();if(Array.isArray(data)){let upd=false;data.forEach(row=>{const ls=JSON.stringify(dbState[row.id]),rs=JSON.stringify(row.data);if(ls!==rs){dbState[row.id]=row.data;localStorage.setItem(row.id,rs);upd=true;}});if(upd){renderRanking();}}}
   }catch(e){}
 }
-if(USE_SUPABASE){syncDatabase();setInterval(syncDatabase,3000);}
+if(USE_SUPABASE){syncDatabase();setInterval(syncDatabase,15000);}
 
 // API Football
 async function syncFromAPI(){
