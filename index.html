@@ -738,7 +738,7 @@ const KNOCKOUT_SCHEDULE = [
   {id:"e30", round:"Semifinales", date:"15 jul 15:00", kickoff:"2026-07-15T15:00:00"},
   // Tercer lugar: Jul 18
   {id:"e31", round:"Tercer lugar", date:"18 jul 15:00", kickoff:"2026-07-18T15:00:00"},
-  // Final: Jul 19
+ // Final: Jul 19
   {id:"e32", round:"Final", date:"19 jul 15:00", kickoff:"2026-07-19T15:00:00"},
 ];
 
@@ -751,15 +751,8 @@ KNOCKOUT_SCHEDULE.forEach((m,i)=>{
     kickoff: m.kickoff
   });
 });
-KNOCKOUT_SCHEDULE.forEach((m,i)=>{
-  const n = i+1;
-  MATCHES.push({
-    id: m.id, type:"knockout", round:m.round, date:m.date,
-    home:{id:`${m.round}_${n}_H`, name:`Clasificado ${n}A`, code:null},
-    away:{id:`${m.round}_${n}_A`, name:`Clasificado ${n}B`, code:null},
-    kickoff: m.kickoff
-  });
-});
+
+let currentUser=null;
 
 let currentUser=null;
 let currentGroupRound="Grupo A",currentKnockoutRound="16avos",currentAdminRound="Grupo A",currentRealGroupTab="A";
