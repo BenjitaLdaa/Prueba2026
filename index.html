@@ -582,13 +582,173 @@ const QUALIFIED_TEAMS = Object.values(GROUPS).flat();
 const getFlagHtml = (code) => code ? `<img src="https://flagcdn.com/w40/${code}.png" class="flag-img" alt="">` : `🏳️`;
 
 const MATCHES=[]; let mId=1;
-Object.keys(GROUPS).forEach((g,gIdx)=>{
+
+// ── FASE DE GRUPOS — Fechas reales FIFA 2026 ──
+// Formato: [home_index, away_index, "YYYY-MM-DD", "HH:MM"] (hora ET convertida a local)
+const GROUP_SCHEDULE = {
+  "A": [
+    [0,1,"2026-06-11","15:00"], // MEX vs RSA
+    [2,3,"2026-06-11","22:00"], // KOR vs CZE
+    [0,2,"2026-06-18","21:00"], // MEX vs KOR
+    [3,1,"2026-06-18","12:00"], // CZE vs RSA
+    [0,3,"2026-06-24","21:00"], // MEX vs CZE
+    [1,2,"2026-06-24","21:00"], // RSA vs KOR
+  ],
+  "B": [
+    [0,3,"2026-06-12","15:00"], // CAN vs BIH
+    [2,1,"2026-06-13","15:00"], // QAT vs SUI
+    [1,3,"2026-06-18","15:00"], // SUI vs BIH
+    [0,2,"2026-06-18","18:00"], // CAN vs QAT
+    [1,0,"2026-06-24","15:00"], // SUI vs CAN
+    [3,2,"2026-06-24","15:00"], // BIH vs QAT
+  ],
+  "C": [
+    [0,1,"2026-06-13","18:00"], // BRA vs MAR
+    [2,3,"2026-06-13","21:00"], // HAI vs SCO
+    [3,1,"2026-06-19","15:00"], // SCO vs MAR
+    [0,2,"2026-06-19","21:00"], // BRA vs HAI
+    [0,3,"2026-06-24","18:00"], // BRA vs SCO
+    [1,2,"2026-06-24","18:00"], // MAR vs HAI
+  ],
+  "D": [
+    [0,1,"2026-06-12","21:00"], // USA vs PAR
+    [2,3,"2026-06-13","00:00"], // AUS vs TUR
+    [0,2,"2026-06-19","15:00"], // USA vs AUS
+    [3,1,"2026-06-19","00:00"], // TUR vs PAR
+    [0,3,"2026-06-25","22:00"], // USA vs TUR
+    [1,2,"2026-06-25","22:00"], // PAR vs AUS
+  ],
+  "E": [
+    [0,1,"2026-06-14","13:00"], // GER vs CUW
+    [2,3,"2026-06-14","19:00"], // CIV vs ECU
+    [0,2,"2026-06-20","16:00"], // GER vs CIV
+    [3,1,"2026-06-20","20:00"], // ECU vs CUW
+    [0,3,"2026-06-25","16:00"], // GER vs ECU
+    [1,2,"2026-06-25","16:00"], // CUW vs CIV
+  ],
+  "F": [
+    [0,1,"2026-06-14","16:00"], // NED vs JPN
+    [2,3,"2026-06-14","22:00"], // TUN vs SWE
+    [0,3,"2026-06-20","13:00"], // NED vs SWE
+    [1,2,"2026-06-20","00:00"], // JPN vs TUN
+    [0,2,"2026-06-25","19:00"], // NED vs TUN
+    [1,3,"2026-06-25","19:00"], // JPN vs SWE
+  ],
+  "G": [
+    [0,1,"2026-06-15","15:00"], // BEL vs EGY
+    [2,3,"2026-06-15","21:00"], // IRN vs NZL
+    [0,2,"2026-06-21","15:00"], // BEL vs IRN
+    [3,1,"2026-06-21","21:00"], // NZL vs EGY
+    [0,3,"2026-06-25","TBD"],   // BEL vs NZL  (simultáneos)
+    [1,2,"2026-06-25","TBD"],   // EGY vs IRN
+  ],
+  "H": [
+    [0,1,"2026-06-15","12:00"], // ESP vs CPV
+    [2,3,"2026-06-15","18:00"], // KSA vs URU
+    [0,2,"2026-06-21","12:00"], // ESP vs KSA
+    [3,1,"2026-06-21","18:00"], // URU vs CPV
+    [0,3,"2026-06-26","TBD"],   // ESP vs URU
+    [1,2,"2026-06-26","TBD"],   // CPV vs KSA
+  ],
+  "I": [
+    [0,1,"2026-06-16","15:00"], // FRA vs SEN
+    [2,3,"2026-06-16","18:00"], // IRQ vs NOR
+    [0,2,"2026-06-22","17:00"], // FRA vs IRQ
+    [3,1,"2026-06-22","20:00"], // NOR vs SEN
+    [0,3,"2026-06-26","15:00"], // FRA vs NOR
+    [1,2,"2026-06-26","15:00"], // SEN vs IRQ
+  ],
+  "J": [
+    [0,1,"2026-06-16","21:00"], // ARG vs ALG
+    [2,3,"2026-06-16","00:00"], // AUT vs JOR
+    [0,2,"2026-06-22","13:00"], // ARG vs AUT
+    [3,1,"2026-06-22","23:00"], // JOR vs ALG
+    [0,3,"2026-06-26","TBD"],   // ARG vs JOR
+    [1,2,"2026-06-26","TBD"],   // ALG vs AUT
+  ],
+  "K": [
+    [0,3,"2026-06-17","13:00"], // POR vs COD
+    [1,2,"2026-06-17","22:00"], // UZB vs COL
+    [0,1,"2026-06-23","13:00"], // POR vs UZB
+    [2,3,"2026-06-23","22:00"], // COL vs COD
+    [0,2,"2026-06-27","TBD"],   // POR vs COL
+    [3,1,"2026-06-27","TBD"],   // COD vs UZB
+  ],
+  "L": [
+    [0,1,"2026-06-17","16:00"], // ENG vs CRO
+    [2,3,"2026-06-17","19:00"], // GHA vs PAN
+    [0,2,"2026-06-23","16:00"], // ENG vs GHA
+    [3,1,"2026-06-23","19:00"], // PAN vs CRO
+    [0,3,"2026-06-27","TBD"],   // ENG vs PAN
+    [1,2,"2026-06-27","TBD"],   // CRO vs GHA
+  ],
+};
+
+Object.keys(GROUP_SCHEDULE).forEach(g=>{
   const t=GROUPS[g];
-  [[0,1],[2,3],[0,2],[3,1],[3,0],[1,2]].forEach((pair,mIdx)=>{
-    let d=new Date(2026,5,11);d.setDate(d.getDate()+Math.floor(gIdx/2)+Math.floor(mIdx/2)*4);
-    let ds=d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'2-digit'}).replace('.','');
-    let hr=mIdx%2===0?"15:00":"21:00";
-    MATCHES.push({id:"m"+mId++,type:"group",round:"Grupo "+g,date:`${ds} ${hr}`,home:t[pair[0]],away:t[pair[1]],groupLetter:g,kickoff:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${hr}:00`});
+  GROUP_SCHEDULE[g].forEach(([hi,ai,dateStr,hr])=>{
+    const isTbd = hr==="TBD";
+    const safeHr = isTbd ? "20:00" : hr;
+    const d = new Date(dateStr+"T"+safeHr+":00");
+    const ds = d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'}).replace('.','').replace(' de ',' ');
+    MATCHES.push({
+      id:"m"+mId++, type:"group", round:"Grupo "+g,
+      date:`${ds} ${isTbd?"TBD":safeHr}`,
+      home:t[hi], away:t[ai], groupLetter:g,
+      kickoff:`${dateStr}T${safeHr}:00`
+    });
+  });
+});
+
+// ── FASE ELIMINATORIA — Fechas reales FIFA 2026 ──
+const KNOCKOUT_SCHEDULE = [
+  // 16avos (Round of 32): Jun 28 – Jul 3
+  {id:"e1",  round:"16avos", date:"28 jun 15:00", kickoff:"2026-06-28T15:00:00"},
+  {id:"e2",  round:"16avos", date:"29 jun 13:00", kickoff:"2026-06-29T13:00:00"},
+  {id:"e3",  round:"16avos", date:"29 jun 16:00", kickoff:"2026-06-29T16:00:00"},
+  {id:"e4",  round:"16avos", date:"29 jun 21:00", kickoff:"2026-06-29T21:00:00"},
+  {id:"e5",  round:"16avos", date:"30 jun 13:00", kickoff:"2026-06-30T13:00:00"},
+  {id:"e6",  round:"16avos", date:"30 jun 17:00", kickoff:"2026-06-30T17:00:00"},
+  {id:"e7",  round:"16avos", date:"30 jun 21:00", kickoff:"2026-06-30T21:00:00"},
+  {id:"e8",  round:"16avos", date:"1 jul 12:00",  kickoff:"2026-07-01T12:00:00"},
+  {id:"e9",  round:"16avos", date:"1 jul 16:00",  kickoff:"2026-07-01T16:00:00"},
+  {id:"e10", round:"16avos", date:"1 jul 20:00",  kickoff:"2026-07-01T20:00:00"},
+  {id:"e11", round:"16avos", date:"2 jul 15:00",  kickoff:"2026-07-02T15:00:00"},
+  {id:"e12", round:"16avos", date:"2 jul 19:00",  kickoff:"2026-07-02T19:00:00"},
+  {id:"e13", round:"16avos", date:"2 jul 21:00",  kickoff:"2026-07-02T21:00:00"},
+  {id:"e14", round:"16avos", date:"3 jul 14:00",  kickoff:"2026-07-03T14:00:00"},
+  {id:"e15", round:"16avos", date:"3 jul 18:00",  kickoff:"2026-07-03T18:00:00"},
+  {id:"e16", round:"16avos", date:"3 jul 21:30",  kickoff:"2026-07-03T21:30:00"},
+  // Octavos (R16): Jul 4–7
+  {id:"e17", round:"Octavos", date:"4 jul 13:00", kickoff:"2026-07-04T13:00:00"},
+  {id:"e18", round:"Octavos", date:"4 jul 17:00", kickoff:"2026-07-04T17:00:00"},
+  {id:"e19", round:"Octavos", date:"5 jul 16:00", kickoff:"2026-07-05T16:00:00"},
+  {id:"e20", round:"Octavos", date:"5 jul 20:00", kickoff:"2026-07-05T20:00:00"},
+  {id:"e21", round:"Octavos", date:"6 jul 12:00", kickoff:"2026-07-06T12:00:00"},
+  {id:"e22", round:"Octavos", date:"6 jul 15:00", kickoff:"2026-07-06T15:00:00"},
+  {id:"e23", round:"Octavos", date:"6 jul 20:00", kickoff:"2026-07-06T20:00:00"},
+  {id:"e24", round:"Octavos", date:"7 jul 16:00", kickoff:"2026-07-07T16:00:00"},
+  // Cuartos: Jul 9–11
+  {id:"e25", round:"Cuartos", date:"9 jul 15:00", kickoff:"2026-07-09T15:00:00"},
+  {id:"e26", round:"Cuartos", date:"9 jul 20:00", kickoff:"2026-07-09T20:00:00"},
+  {id:"e27", round:"Cuartos", date:"10 jul 15:00",kickoff:"2026-07-10T15:00:00"},
+  {id:"e28", round:"Cuartos", date:"11 jul 15:00",kickoff:"2026-07-11T15:00:00"},
+  // Semifinales: Jul 14–15
+  {id:"e29", round:"Semifinales", date:"14 jul 15:00", kickoff:"2026-07-14T15:00:00"},
+  {id:"e30", round:"Semifinales", date:"15 jul 15:00", kickoff:"2026-07-15T15:00:00"},
+  // Tercer lugar: Jul 18
+  {id:"e31", round:"Tercer lugar", date:"18 jul 15:00", kickoff:"2026-07-18T15:00:00"},
+  // Final: Jul 19
+  {id:"e32", round:"Final", date:"19 jul 15:00", kickoff:"2026-07-19T15:00:00"},
+];
+
+KNOCKOUT_SCHEDULE.forEach((m,i)=>{
+  const n = i+1;
+  MATCHES.push({
+    id: m.id, type:"knockout", round:m.round, date:m.date,
+    home:{id:`${m.round}_${n}_H`, name:`Clasificado ${n}A`, code:null},
+    away:{id:`${m.round}_${n}_A`, name:`Clasificado ${n}B`, code:null},
+    kickoff: m.kickoff
   });
 });
 [{name:"16avos",count:16,start:new Date(2026,5,28)},{name:"Octavos",count:8,start:new Date(2026,6,4)},{name:"Cuartos",count:4,start:new Date(2026,6,9)},{name:"Semifinales",count:2,start:new Date(2026,6,14)},{name:"Final",count:1,start:new Date(2026,6,19)}]
